@@ -1,5 +1,8 @@
 package beavers;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -30,7 +33,7 @@ public class Player {
 
     public void go(Room room) {
 this.room = room;
-this.room.describe();
+this.room.getDescription();
     }
 
 
@@ -57,19 +60,23 @@ this.room.describe();
         }
         }
 
-    public ArrayList<NPC> getNpcs() {
-        return npcs;
-    }
-
-    public void setNpcs(ArrayList<NPC> npcs) {
-        this.npcs = npcs;
-    }
-
-
-
     public void takeItem(Item item) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'takeItem'");
+        inventory.add(item);
+        room.removeItem(item);
+    }
+    private String readFile(String fileName) {
+ StringBuilder sb = new StringBuilder();
+ try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+     String line = br.readLine();
+     while (line != null) {
+         sb.append(line);
+         sb.append(System.lineSeparator());
+         line = br.readLine();
+     }
+    }   catch (IOException ex) {
+        System.out.println("Error reading file.");
+        }
+        return sb.toString();
     }
 
 }

@@ -1,5 +1,8 @@
 package beavers;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -33,15 +36,28 @@ public final class Game {
         rooms.put("living room", livingRoom);
         rooms.put("bedroom", bedroom);
         rooms.put("bathroom", bathroom);
-        foyer.setDescription("You are in the foyer.");
-        kitchen.setDescription("You are in the kitchen.");
-        livingRoom.setDescription("You are in the living room.");
-        bedroom.setDescription("You are in the bedroom.");
-        bathroom.setDescription("You are in the bathroom.");
+        foyer.setDescription(readFile("foyer.txt"));
+        kitchen.setDescription(readFile("kitchen.txt"));
+        livingRoom.setDescription(readFile("livingRoom.txt"));
+        bedroom.setDescription(readFile("bedroom.txt"));
+        bathroom.setDescription(readFile("bathroom.txt"));
 
 
     }
-
+private String readFile(String fileName) {
+ StringBuilder sb = new StringBuilder();
+ try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+     String line = br.readLine();
+     while (line != null) {
+         sb.append(line);
+         sb.append(System.lineSeparator());
+         line = br.readLine();
+     }
+    }   catch (IOException ex) {
+        System.out.println("Error reading file.");
+        }
+        return sb.toString();
+    }
     private void initualizeCommands() {
 commands = new HashMap<>();
         commands.put("go", (Command) () -> {
@@ -81,7 +97,7 @@ commands = new HashMap<>();
             
         });
         commands.put("look", () -> {
-            this.player.getRoom().describe();
+            this.player.getRoom().describeRoom();
             this.player.getRoom().listItems();
         });
     }
@@ -112,5 +128,12 @@ commands = new HashMap<>();
         rooms.get("bathroom").addItem(puzzle);
 
     }
-
+    public void populate () {
+        NPC drWhite = new NPC("Dr. White", "A lanky looking man in a white coat.");
+        NPC msSagely = new NPC("Ms. Sagely", "A wisen but kind looking woman who glances at you with a smile.");
+        NPC fuzzy = new NPC("Fuzzy", "Fuzzy is an andriod teddybear with a screen for a face.");
+        rooms.get("foyer").addNPC(drWhite);
+        rooms.get("living room").addNPC(msSagely);
+        rooms.get("bedroom").addNPC(fuzzy);
+    }
 }

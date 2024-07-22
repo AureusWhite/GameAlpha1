@@ -1,6 +1,11 @@
 package beavers;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Room {
@@ -9,14 +14,46 @@ public class Room {
     private String description;
     private String name;
     private Clock clock;
-    private String morning, afternoon, evening;
+    private String optional;
+
 
     public Room(String name) {
         this.name = name;
         npcs = new ArrayList <>();
         items = new ArrayList <>();
+        clock = new Clock();
+        createItemFile(name, description,this.optional);
+    }
+    private void createItemFile(String name, String desc,String optional) {
+        String fileName = name + ".txt";
+        File file = new File(fileName);
+        if(!file.exists()) {
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
+            fileWriter.write("Item Name: " + name + "\n");
+            fileWriter.write("Description: " + desc + "\n");
+            fileWriter.write("Optional: " + optional+"\n");
+        } catch (IOException e) {
+            System.out.println("Something done sploded :( " + fileName);
+            e.printStackTrace();
+        }
+        }
     }
 
+
+private String readFile(String fileName) {
+ StringBuilder sb = new StringBuilder();
+ try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+     String line = br.readLine();
+     while (line != null) {
+         sb.append(line);
+         sb.append(System.lineSeparator());
+         line = br.readLine();
+     }
+    }   catch (IOException ex) {
+        System.out.println("Error reading file.");
+        }
+        return sb.toString();
+    }
 
 public NPC getNPC(String name) {
         for (NPC npc : npcs) {
@@ -31,16 +68,6 @@ public NPC getNPC(String name) {
     }
     public void removeNPC(NPC npc) {
         npcs.remove(npc);
-    }
-    public void describe() {
-        System.out.println(description);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
     public String getName() {
         return name;
@@ -86,17 +113,6 @@ public NPC getNPC(String name) {
     public void setNpcs(ArrayList<NPC> npcs) {
         this.npcs = npcs;
     }
-    public String getDescription(String timeOfDay) {
-        return switch (timeOfDay) {
-            case "morning" -> morning;
-            case "afternoon" -> afternoon;
-            case "evening" -> evening;
-            default -> "No description available";
-        };
-    }
-    public String toString() {
-        return name;
-    }
     public void describeItems() {
         for (Item item : this.items) {
             System.out.println(item.getName());
@@ -110,11 +126,11 @@ public NPC getNPC(String name) {
     public void describeRoom() {
         this.clock.getCurrentHour();
         if (clock.getCurrentHour() < 12) {  
-            System.out.println(this.getDescription(morning));
+            System.out.println(this.getDescription());
         } else if (clock.getCurrentHour() == 12) {
-            System.out.println(this.getDescription(afternoon));
+            System.out.println(this.getDescription());
         } else {
-            System.out.println(this.getDescription(evening));
+            System.out.println(this.getDescription());
         }
         System.out.println(description);
 
@@ -162,47 +178,6 @@ public NPC getNPC(String name) {
         return description;
     }
 
-
-    public Clock getClock() {
-        return clock;
-    }
-
-
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
-
-
-    public String getMorning() {
-        return morning;
-    }
-
-
-    public void setMorning(String morning) {
-        this.morning = morning;
-    }
-
-
-    public String getAfternoon() {
-        return afternoon;
-    }
-
-
-    public void setAfternoon(String afternoon) {
-        this.afternoon = afternoon;
-    }
-
-
-    public String getEvening() {
-        return evening;
-    }
-
-
-    public void setEvening(String evening) {
-        this.evening = evening;
-    }
-
-
     public Item getItem(String input) {
         for (Item item : items) {
             if (item.getName().equals(input)) {
@@ -212,4 +187,11 @@ public NPC getNPC(String name) {
         return null;
     }
 
+
+    public void setDescription(String description) {
+
+        this.description = description;
+
+    }
+    
 }
