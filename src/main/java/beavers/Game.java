@@ -9,19 +9,67 @@ import java.util.Scanner;
 public final class Game {
 
     private final Player player;
-    private Room room;
-    private NPC npc;
     private boolean running;
     private HashMap<String, Command> commands;
     private HashMap<String, Room> rooms;
+    private String input;
+    private Scanner scanner;
 
-    public Game(Player player, Room room, NPC npc) {
+    public Game(Player player) {
+        scanner = new Scanner(System.in);
         this.player = player;
-        this.room = room;
-        this.npc = npc;
         initualizeCommands();
         buildMap();
         buildWorld();
+    }
+
+    public void start() {
+        running = true;
+        System.out.println("Welcome to the game.");
+        System.out.println("Type 'help' for a list of commands.");
+    this.gameLoop();
+    }
+    private void gameLoop() {
+        while (running) {
+            System.out.println("What do you want to do?");
+            try {
+                // Directly read the line, which will wait for user input
+                input = scanner.nextLine();
+                Command command = commands.get(input);
+                if (command != null) {
+                    command.execute();
+                } else {
+                    System.out.println("No such command.");
+                }
+            } catch (Exception ex) {
+                System.out.println("Error reading input: " + ex.getMessage());
+                // Optionally, break out of the loop or handle the exception as needed
+            }
+        }
+    }
+public void buildWorld(){
+    Item key = new Item("key", "A shiny key.");
+    Item diaper = new Item("diaper", "A clean white diaper.");
+    Item book = new Item("book", "A book for early readers.");
+    Item phone = new Item("phone", "A large red toy phone.");
+    Item puzzle = new Item("puzzle", "A wooden puzzle.");
+    rooms.get("foyer").addItem(key);
+    rooms.get("kitchen").addItem(diaper);
+    rooms.get("living room").addItem(book);
+    rooms.get("bedroom").addItem(phone);
+    rooms.get("bathroom").addItem(puzzle);
+
+}
+    public void populate () {
+        NPC drWhite = new NPC("Dr. White", "A lanky looking man in a white coat.");
+        NPC msSagely = new NPC("Ms. Sagely", "A wisen but kind looking woman who glances at you with a smile.");
+        NPC fuzzy = new NPC("Fuzzy", "Fuzzy is an andriod teddybear with a screen for a face.");
+        NPC susy = new NPC("Susy", "A little girl with a red bow in her hair.");
+        rooms.get("foyer").addNPC(drWhite);
+        rooms.get("living room").addNPC(msSagely);
+        rooms.get("bedroom").addNPC(fuzzy);
+        rooms.get("bathroom").addNPC(susy);
+
     }
 
     private void buildMap() {
@@ -36,33 +84,28 @@ public final class Game {
         rooms.put("living room", livingRoom);
         rooms.put("bedroom", bedroom);
         rooms.put("bathroom", bathroom);
-        foyer.setDescription(readFile("foyer.txt"));
-        kitchen.setDescription(readFile("kitchen.txt"));
-        livingRoom.setDescription(readFile("livingRoom.txt"));
-        bedroom.setDescription(readFile("bedroom.txt"));
-        bathroom.setDescription(readFile("bathroom.txt"));
-
 
     }
-private String readFile(String fileName) {
- StringBuilder sb = new StringBuilder();
- try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-     String line = br.readLine();
-     while (line != null) {
-         sb.append(line);
-         sb.append(System.lineSeparator());
-         line = br.readLine();
-     }
-    }   catch (IOException ex) {
-        System.out.println("Error reading file.");
+    @SuppressWarnings("unused")
+    private String readFile(String fileName) {
+     StringBuilder sb = new StringBuilder();
+     try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+         String line = br.readLine();
+         while (line != null) {
+             sb.append(line);
+             sb.append(System.lineSeparator());
+             line = br.readLine();
+         }
+        }   catch (IOException ex) {
+            System.out.println("Error reading file.");
+            }
+            return sb.toString();
         }
-        return sb.toString();
-    }
     private void initualizeCommands() {
 commands = new HashMap<>();
         commands.put("go", (Command) () -> {
             System.out.println("Where?");
-            Scanner scanner = new Scanner(System.in);
+            try {
                 String input = scanner.nextLine();
                 Room nextRoom = rooms.get(input);
                 if (nextRoom != null) {
@@ -70,6 +113,9 @@ commands = new HashMap<>();
                 } else {
                     System.out.println("No room by that name.");
                 }
+            }finally {
+                System.out.println("Error reading input.");
+            }
             });
         commands.put("talk", () -> player.talk());
         commands.put("quit", () -> running = false);
@@ -84,14 +130,17 @@ commands = new HashMap<>();
         });
         commands.put("take", () -> {
             System.out.println("What do you want to take?");
-            Scanner scanner = new Scanner(System.in);
-            String input = scanner.nextLine();
-            if (player.getRoom().hasItem(input)) {
-                Item item = player.getRoom().getItem(input);
-                player.takeItem(item);
-                System.out.println("You took " + item.getName());
-            } else {
-                System.out.println("No such item.");
+            try {
+                String input = scanner.nextLine();
+                if (player.getRoom().hasItem(input)) {
+                    Item item = player.getRoom().getItem(input);
+                    player.takeItem(item);
+                    System.out.println("You took " + item.getName());
+                } else {
+                    System.out.println("No such item.");
+                }
+            }finally {
+                System.out.println("Error reading input.");
             }
 
             
@@ -100,40 +149,5 @@ commands = new HashMap<>();
             this.player.getRoom().describeRoom();
             this.player.getRoom().listItems();
         });
-    }
-
-    public void start() {
-        running = true;
-        while (running) {
-            System.out.println("What do you want to do?");
-            String input = System.console().readLine();
-            Command command = commands.get(input);
-            if (command != null) {
-                command.execute();
-            } else {
-                System.out.println("Type 'help' for a list of commands.");
-            }
-        }
-    }
-    public void buildWorld(){
-        Item key = new Item("key", "A shiny key.");
-        Item diaper = new Item("diaper", "A clean white diaper.");
-        Item book = new Item("book", "A book for early readers.");
-        Item phone = new Item("phone", "A large red toy phone.");
-        Item puzzle = new Item("puzzle", "A wooden puzzle.");
-        rooms.get("foyer").addItem(key);
-        rooms.get("kitchen").addItem(diaper);
-        rooms.get("living room").addItem(book);
-        rooms.get("bedroom").addItem(phone);
-        rooms.get("bathroom").addItem(puzzle);
-
-    }
-    public void populate () {
-        NPC drWhite = new NPC("Dr. White", "A lanky looking man in a white coat.");
-        NPC msSagely = new NPC("Ms. Sagely", "A wisen but kind looking woman who glances at you with a smile.");
-        NPC fuzzy = new NPC("Fuzzy", "Fuzzy is an andriod teddybear with a screen for a face.");
-        rooms.get("foyer").addNPC(drWhite);
-        rooms.get("living room").addNPC(msSagely);
-        rooms.get("bedroom").addNPC(fuzzy);
     }
 }

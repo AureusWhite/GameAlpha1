@@ -23,6 +23,7 @@ public class Room {
         items = new ArrayList <>();
         clock = new Clock();
         createItemFile(name, description,this.optional);
+        
     }
     private void createItemFile(String name, String desc,String optional) {
         String fileName = name + ".txt";
@@ -34,7 +35,6 @@ public class Room {
             fileWriter.write("Optional: " + optional+"\n");
         } catch (IOException e) {
             System.out.println("Something done sploded :( " + fileName);
-            e.printStackTrace();
         }
         }
     }
@@ -101,14 +101,6 @@ public NPC getNPC(String name) {
 
     public void setItems(ArrayList<Item> items) {
         this.items = items;
-    }
-
-
-    public NPC[] getNPCs() {
-        for (NPC npc : npcs) {
-            System.out.println(npc.getName());
-        }
-        return null;
     }
     public void setNpcs(ArrayList<NPC> npcs) {
         this.npcs = npcs;

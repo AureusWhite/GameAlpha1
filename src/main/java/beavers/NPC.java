@@ -13,13 +13,8 @@ public class NPC {
         return name;
     }
     public void dialogue(Player player) {
-        switch(player.getPerk()){
-            case "friendly" -> System.out.println("Hello, "+player.getName()+"! How are you today?");
-            case "rude" -> System.out.println("What do you want?");
-            case "neutral" -> System.out.println("Hello, "+player.getName()+".");
-
-        }
-
+        System.out.println("Hello, " + player.getName() + "!");
+        System.out.println(disc);
     }
     public void setName(String name) {
         this.name = name;
@@ -30,5 +25,4 @@ public class NPC {
     public void setDisc(String disc) {
         this.disc = disc;
     }   
-
 }
