@@ -9,19 +9,24 @@ public class NPC {
         this.name = name;
         this.disc = disc;
     }
+    
     public String getName() {
         return name;
     }
+    
     public void dialogue(Player player) {
         System.out.println("Hello, " + player.getName() + "!");
         System.out.println(disc);
     }
+    
     public void setName(String name) {
         this.name = name;
     }
+    
     public String getDisc() {
         return disc;
     }
+    
     public void setDisc(String disc) {
         this.disc = disc;
     }   

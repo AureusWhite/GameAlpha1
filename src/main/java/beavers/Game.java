@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 public final class Game {
 
+    public static Game game;
     private final Player player;
     private boolean running;
     private HashMap<String, Command> commands;
@@ -16,6 +17,7 @@ public final class Game {
     private Scanner scanner;
 
     public Game(Player player) {
+        game = this;
         scanner = new Scanner(System.in);
         this.player = player;
         initualizeCommands();
@@ -26,15 +28,16 @@ public final class Game {
     public void start() {
         running = true;
         System.out.println("Welcome to the game.");
-        System.out.println("Type 'help' for a list of commands.");
-    this.gameLoop();
+        System.out.println("Type 'help' for a list of advanced commands.");
+        this.gameLoop();
     }
+    
     public void buildWorld(){
-        Item key = new Item("key", "A shiny key.");
-        Item diaper = new Item("diaper", "A clean white diaper.");
-        Item book = new Item("book", "A book for early readers.");
-        Item phone = new Item("phone", "A large red toy phone.");
-        Item puzzle = new Item("puzzle", "A wooden puzzle.");
+        Item key = new Item("Key Card", "A plastic card used to access various rooms of the facility, you have one yourself. Who's is this?.", "key");
+        Item diaper = new Item("Diaper", "A clean white diaper.", "Clothing");
+        Item book = new Item("Book", "So you got rejuved, what now. A book for rejuve early readers.", "Book");
+        Item phone = new Item("Phone", "A large red toy phone, it rings but the person on the other end never answers, how rude.", "Toy");
+        Item puzzle = new Item("puzzle", "A wooden puzzle.", "Toy");
         rooms.get("foyer").addItem(key);
         rooms.get("kitchen").addItem(diaper);
         rooms.get("livingroom").addItem(book);
@@ -42,7 +45,13 @@ public final class Game {
         rooms.get("bathroom").addItem(puzzle);
     
     }
-public void populate () {
+    
+    public String clearConsole(){
+        return "\033[H\033[2J";
+    
+    }
+    
+    public void populate () {
     NPC drWhite = new NPC("Dr. White", "A lanky looking man in a white coat.");
     NPC msSagely = new NPC("Ms. Sagely", "A wisen but kind looking woman who glances at you with a smile.");
     NPC fuzzy = new NPC("Fuzzy", "Fuzzy is an andriod teddybear with a screen for a face.");
@@ -53,6 +62,7 @@ public void populate () {
     rooms.get("bathroom").addNPC(susy);
 
 }
+   
     public Player getPlayer() {
         return player;
     }
@@ -60,9 +70,11 @@ public void populate () {
     public boolean isRunning() {
         return running;
     }
+   
     public void setRunning(boolean running) {
         this.running = running;
     }
+   
     public HashMap<String, Command> getCommands() {
         return commands;
     }
@@ -97,7 +109,10 @@ public void populate () {
 
     private void gameLoop() {
         while (running) {
-            System.out.println("What do you want to do?");
+for(String command : commands.keySet()) {
+    System.out.print(" "+command+" |");
+}   System.out.println();
+            System.out.print("What do you want to do? -> ");
             try {
                 input = scanner.nextLine();
                 Command command = commands.get(input);
@@ -153,7 +168,7 @@ commands = new HashMap<>();
                 Room nextRoom = rooms.get(input);
                 if (nextRoom != null) {
                     player.go(nextRoom);
-                    System.out.print(readFile((player.getRoom().getName())+player.getRoom().clock.getTimeOfDay()));
+                    System.out.print(readFile((player.getRoom().getName())+player.getRoom().getClock().getTimeOfDay()));
                     
                 } else {
                     System.out.println("No room by that name.");
@@ -172,7 +187,7 @@ commands = new HashMap<>();
             }
         });
         commands.put("inventory", () -> {
-            System.out.println(player.getInventory());
+            player.listItems();
         });
         commands.put("take", () -> {
             System.out.println("What do you want to take?");
@@ -192,7 +207,7 @@ commands = new HashMap<>();
             
         });
         commands.put("look", () -> {
-            System.out.print(readFile(player.getRoom().getName().concat(player.getRoom().clock.getTimeOfDay())));    ;
+            System.out.print(readFile(player.getRoom().getName().concat(player.getRoom().getClock().getTimeOfDay())));    ;
             this.player.getRoom().listItems();
         });
     }
