@@ -11,9 +11,9 @@ import java.util.ArrayList;
 public class Room {
     ArrayList <NPC> npcs;
     ArrayList <Item> items;
-    private String description;
+    private String description="blargh";    
     private String name;
-    private Clock clock;
+    public Clock clock;
     private String optional;
 
 
@@ -26,13 +26,14 @@ public class Room {
         
     }
     private void createItemFile(String name, String desc,String optional) {
-        String fileName = name + ".txt";
+        String tod = clock.getTimeOfDay();
+        String fileName = name + tod +".txt";
         File file = new File(fileName);
         if(!file.exists()) {
         try (FileWriter fileWriter = new FileWriter(fileName)) {
-            fileWriter.write("Item Name: " + name + "\n");
+            fileWriter.write("Room Name: " + name + "\n");
             fileWriter.write("Description: " + desc + "\n");
-            fileWriter.write("Optional: " + optional+"\n");
+            fileWriter.write("Time of Day: " + tod +"\n");
         } catch (IOException e) {
             System.out.println("Something done sploded :( " + fileName);
         }
@@ -116,16 +117,7 @@ public NPC getNPC(String name) {
         }
     }
     public void describeRoom() {
-        this.clock.getCurrentHour();
-        if (clock.getCurrentHour() < 12) {  
-            System.out.println(this.getDescription());
-        } else if (clock.getCurrentHour() == 12) {
-            System.out.println(this.getDescription());
-        } else {
-            System.out.println(this.getDescription());
-        }
-        System.out.println(description);
-
+        readFile(this.getName() + clock.getTimeOfDay() + ".txt");
                 System.out.println("Items in the room:");
         describeItems();
         System.out.println("NPCs in the room:");
@@ -184,6 +176,9 @@ public NPC getNPC(String name) {
 
         this.description = description;
 
+    }
+    public String getTod() {
+        return clock.getTimeOfDay();
     }
     
 }

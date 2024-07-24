@@ -13,13 +13,17 @@ public class Player {
     private ArrayList<Item> inventory;
     private ArrayList<NPC> npcs;
     private HashMap<String, Integer> stats;
-    private String perk="Default", name="Default", description="Default";
+    private String perk, name, description;
     private int social, fineMotor, grossMotor, imgenation, learning, emotional;
+
     private int  resilience,luck, hunger, thirst, fatigue, stress, money, experience, level;
+
+
+
     private HashMap<String, Perk> perks;
     private Perk TeaParty,Brat,Trouble,Shy,Bookworm,Rebel,Overachiever,TeacherPet,ClassClown,Slacker,Popular,Outcast,Geek,Confederate;
-private Scanner scanner; 
-     public Player(){
+    private Scanner scanner;
+    public Player(){
         scanner = new Scanner(System.in);
         inventory = new ArrayList<Item>();
         npcs = new ArrayList<NPC>();
@@ -29,95 +33,16 @@ private Scanner scanner;
         createPlayer();
         
     }
-
-    private void initualizePerks() {
-        Perk TeaParty = new Perk() {
-            String name = "Tea Party";
-            String description = "You are a Tea Party member. You are a social butterfly and can talk to anyone.";
-        };
-        this.perks.put("Tea Party", TeaParty);
-        Perk Brat = new Perk() {
-            String name = "Brat";
-            String description = "You are a Brat. You are used to getting your way and can be a bit of a bully.";    
-        };
-        this.perks.put("Brat", Brat);
-        
-         Trouble = new Perk() {
-            String name = "Trouble";
-            String description = "You are Trouble. You are always getting into mischief.";
-        };
-        perks.put("Trouble", Trouble);
-        Perk Shy = new Perk() {
-            String name = "Shy";
-            String description = "You are Shy. You are quiet and reserved.";
-        };
-        perks.put("Shy", Shy);
-        Perk Bookworm = new Perk() {
-            String name = "Bookworm";
-            String description = "You are a Bookworm. You love to read and learn.";
-        };
-        perks.put("Bookworm", Bookworm);
-        Perk Rebel = new Perk() {
-            String name = "Rebel";
-            String description = "You are a Rebel. You don't follow the rules.";
-        };
-        perks.put("Rebel", Rebel);
-        Perk Overachiever = new Perk() {
-            String name = "Overachiever";
-            String description = "You are an Overachiever. You always do your best.";
-        };
-        perks.put("Overachiever", Overachiever);
-        Perk TeacherPet = new Perk() {
-            String name = "Teacher's Pet";
-            String description = "You are the Teacher's Pet. You always do what you are told.";
-        };
-        perks.put("Teacher's Pet", TeacherPet);
-        Perk ClassClown = new Perk() {
-            String name = "Class Clown";
-            String description = "You are the Class Clown. You love to make people laugh.";
-        };
-        perks.put("Class Clown", ClassClown);
-        Perk Slacker = new Perk() {
-            String name = "Slacker";
-            String description = "You are a Slacker. You don't like to do work.";
-        };
-        perks.put("Slacker", Slacker);
-        Perk Popular = new Perk() {
-            String name = "Popular";
-            String description = "You are Popular. Everyone likes you.";
-        };
-        perks.put("Popular", Popular);
-        Perk Outcast = new Perk() {
-            String name = "Outcast";
-            String description = "You are an Outcast. You don't fit in.";
-        };
-        perks.put("Outcast", Outcast);
-        perks.put("Geek", Geek);
-        Perk Confederate = new Perk() {
-            {
-            String  name = "Confederate";
-            String description = "You are a Confederate. You are a member of the Confederacy.";
-            }
-        };
-        perks.put("Confederate", Confederate);
-
-        
-
-
-
+public String getPerk() {
+    return perk;
+} 
+     public void setPerk(String perk) {
+        this.perk = perk;
     }
-
-
 
     public void addNPC(NPC npc) {
         npcs.add(npc);
 }
-
-
-
-    Room getRoom() {
-        return this.room;
-    }
 
 
 
@@ -132,9 +57,14 @@ this.room.getDescription();
         return name;
     }
 
+
+
     public String getPerks() {
         return perks.keySet().toString();
     }
+
+
+
     public String getInventory() {
         if (inventory.isEmpty()) {
             return "Inventory is empty.";
@@ -147,21 +77,6 @@ this.room.getDescription();
         inventory.add(item);
         room.removeItem(item);
     }
-    @SuppressWarnings("unused")
-    private String readFile(String fileName) {
- StringBuilder sb = new StringBuilder();
- try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-     String line = br.readLine();
-     while (line != null) {
-         sb.append(line);
-         sb.append(System.lineSeparator());
-         line = br.readLine();
-     }
-    }   catch (IOException ex) {
-        System.out.println("Error reading file.");
-        }
-        return sb.toString();
-    }
     public void talk() {
         System.out.println("To whom?");
         try (Scanner scanner = new Scanner(System.in)) {
@@ -171,71 +86,12 @@ this.room.getDescription();
         
     }
 
-    private void createPlayer() {
-        stats.put("resilience", 5);
-        stats.put("fineMotor", 5);
-        stats.put("grossMotor", 5);
-        stats.put("learning", 5);
-        stats.put("emotional", 5);
-        stats.put("social", 5);
-        stats.put("luck", 5);
-        stats.put("hunger", 0);
-        stats.put("thirst", 0);
-        stats.put("fatigue", 0);
-        stats.put("stress", 0);
-        stats.put("money", 0);
-        stats.put("experience", 0);
-        stats.put("level", 1);
-        stats.put("imgenation", 5);
-        perks.put("Tea Party", TeaParty);
-        perks.put("Brat", Brat);
-        perks.put("Trouble", Trouble);
-        perks.put("Shy", Shy);
-        perks.put("Bookworm", Bookworm);
-        perks.put("Rebel",  Rebel);
-        perks.put("Overachiever", Overachiever);
-        perks.put("Teacher's Pet", TeacherPet);
-        perks.put("Class Clown", ClassClown);
-        perks.put("Slacker", Slacker);
-        perks.put("Popular", Popular);
-        perks.put("Outcast", Outcast);
-        perks.put("Geek", Geek);
-        this.resilience = 5;
-        this.fineMotor = 5;
-        this.grossMotor = 5;
-        this.learning = 5;
-        this.emotional = 5;
-        this.social = 5;
-        this.luck = 5;
-        this.hunger = 0;
-        this.thirst = 0;
-        this.fatigue = 0;
-        this.stress = 0;
-        this.money = 0;
-        this.experience = 0;
-        this.level = 1;
-        this.imgenation = 5;
-        this.perk = "Default";
-            System.out.println("What is your name?");
-            String input = this.scanner.nextLine();
-            this.name = input;
-            System.out.println("What is your perk?");
-            input = this.scanner.nextLine();
-            this.perk = input;
-            System.out.println("What is your description?");
-            input = this.scanner.nextLine();
-            this.description = input;
-
-    }
-
     public int getResilience() {
         return resilience;
     }
-
     public void setResilience(int resilience) {
         this.resilience = resilience;
     }
-
     public int getFineMotor() {
         return fineMotor;
     }
@@ -356,7 +212,6 @@ this.room.getDescription();
         this.description = description;
     }
 
-
     public String getPerk(String perk) {
         if(perks.containsKey(perk)){
             return perk;
@@ -364,10 +219,227 @@ this.room.getDescription();
         return "Invalid perk. Please choose from the following: \n" + perks.keySet();
     }
 
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public void setInventory(ArrayList<Item> inventory) {
+        this.inventory = inventory;
+    }
+
+    public ArrayList<NPC> getNpcs() {
+        return npcs;
+    }
 
 
+    public void setNpcs(ArrayList<NPC> npcs) {
+        this.npcs = npcs;
+    }
+
+
+
+    public HashMap<String, Integer> getStats() {
+        return stats;
+    }
+    public void setStats(HashMap<String, Integer> stats) {
+        this.stats = stats;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPerks(HashMap<String, Perk> perks) {
+        this.perks = perks;
+    }
+    public Perk getTeaParty() {
+        return TeaParty;
+    }
+    public void setTeaParty(Perk teaParty) {
+        TeaParty = teaParty;
+    }
+    public Perk getBrat() {
+        return Brat;
+    }
+    public void setBrat(Perk brat) {
+        Brat = brat;
+    }
+    public Perk getTrouble() {
+        return Trouble;
+    }
+    public void setTrouble(Perk trouble) {
+        Trouble = trouble;
+    }
+    public Perk getShy() {
+        return Shy;
+    }
+    public void setShy(Perk shy) {
+        Shy = shy;
+    }
+    public Perk getBookworm() {
+        return Bookworm;
+    }
+    public void setBookworm(Perk bookworm) {
+        Bookworm = bookworm;
+    }
+    public Perk getRebel() {
+        return Rebel;
+    }
+    public void setRebel(Perk rebel) {
+        Rebel = rebel;
+    }
+    public Perk getOverachiever() {
+        return Overachiever;
+    }
+    public void setOverachiever(Perk overachiever) {
+        Overachiever = overachiever;
+    }
+    public Perk getTeacherPet() {
+        return TeacherPet;
+    }
+    public void setTeacherPet(Perk teacherPet) {
+        TeacherPet = teacherPet;
+    }
+    public Perk getClassClown() {
+        return ClassClown;
+    }
+    public void setClassClown(Perk classClown) {
+        ClassClown = classClown;
+    }
+    public Perk getSlacker() {
+        return Slacker;
+    }
+    public void setSlacker(Perk slacker) {
+        Slacker = slacker;
+    }
+    public Perk getPopular() {
+        return Popular;
+    }
+    public void setPopular(Perk popular) {
+        Popular = popular;
+    }
+    public Perk getOutcast() {
+        return Outcast;
+    }
+    public void setOutcast(Perk outcast) {
+        Outcast = outcast;
+    }
+    public Perk getGeek() {
+        return Geek;
+    }
+    public void setGeek(Perk geek) {
+        Geek = geek;
+    }
+    public Perk getConfederate() {
+        return Confederate;
+    }
+    public void setConfederate(Perk confederate) {
+        Confederate = confederate;
+    }
+    public Scanner getScanner() {
+        return scanner;
+    }
+    public void setScanner(Scanner scanner) {
+        this.scanner = scanner;
+    }
+    @Override
+    public String toString() {
+        return "Player[]";
+    }
+    Room getRoom() {
+        return this.room;
+    }
     void setPerk(Perk perk2) {
         this.perk = perk2.getName();
+    }
+    private void initualizePerks() {
+        perks.put("Tea Party", TeaParty);
+        perks.put("Brat", Brat);
+        perks.put("Trouble", Trouble);
+        perks.put("Shy", Shy);
+        perks.put("Bookworm", Bookworm);
+        perks.put("Rebel", Rebel);
+        perks.put("Overachiever", Overachiever);
+        perks.put("Teacher's Pet", TeacherPet);
+        perks.put("Class Clown", ClassClown);
+        perks.put("Slacker", Slacker);
+        perks.put("Popular", Popular);
+        perks.put("Outcast", Outcast);
+        perks.put("Geek", Geek);
+        perks.put("Confederate", Confederate);
+    }
+    @SuppressWarnings("unused")
+    private String readFile(String fileName) {
+ StringBuilder sb = new StringBuilder();
+ try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+     String line = br.readLine();
+     while (line != null) {
+         sb.append(line);
+         sb.append(System.lineSeparator());
+         line = br.readLine();
+     }
+    }   catch (IOException ex) {
+        System.out.println("Error reading file.");
+        }
+        return sb.toString();
+    }
+    private void createPlayer() {
+        stats.put("resilience", 5);
+        stats.put("fineMotor", 5);
+        stats.put("grossMotor", 5);
+        stats.put("learning", 5);
+        stats.put("emotional", 5);
+        stats.put("social", 5);
+        stats.put("luck", 5);
+        stats.put("hunger", 0);
+        stats.put("thirst", 0);
+        stats.put("fatigue", 0);
+        stats.put("stress", 0);
+        stats.put("money", 0);
+        stats.put("experience", 0);
+        stats.put("level", 1);
+        stats.put("imgenation", 5);
+        perks.put("Tea Party", TeaParty);
+        perks.put("Brat", Brat);
+        perks.put("Trouble", Trouble);
+        perks.put("Shy", Shy);
+        perks.put("Bookworm", Bookworm);
+        perks.put("Rebel",  Rebel);
+        perks.put("Overachiever", Overachiever);
+        perks.put("Teacher's Pet", TeacherPet);
+        perks.put("Class Clown", ClassClown);
+        perks.put("Slacker", Slacker);
+        perks.put("Popular", Popular);
+        perks.put("Outcast", Outcast);
+        perks.put("Geek", Geek);
+        this.resilience = 5;
+        this.fineMotor = 5;
+        this.grossMotor = 5;
+        this.learning = 5;
+        this.emotional = 5;
+        this.social = 5;
+        this.luck = 5;
+        this.hunger = 0;
+        this.thirst = 0;
+        this.fatigue = 0;
+        this.stress = 0;
+        this.money = 0;
+        this.experience = 0;
+        this.level = 1;
+        this.imgenation = 5;
+        this.perk = "Default";
+            System.out.println("What is your name?");
+            String input = this.scanner.nextLine();
+            this.name = input;
+            System.out.println("What is your perk?");
+            input = this.scanner.nextLine();
+            if(perks.containsKey(input)){
+                this.perk = input;
+            }else { 
+                System.out.println("Invalid perk. Please choose from the following: \n" + perks.keySet());
+            }
+            System.out.println("What is your description?");
+            input = this.scanner.nextLine();
+            this.description = input;
+
     }
 
 }

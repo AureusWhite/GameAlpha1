@@ -3,7 +3,9 @@ package beavers;
 
 public class Main {
 
+    @SuppressWarnings("unused")
     private static Room room;
+    @SuppressWarnings("unused")
     private static NPC npc;
 
     public static void main(String[] args) {

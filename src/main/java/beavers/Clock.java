@@ -4,7 +4,7 @@ public class Clock {
     private int time; // time is represented in minutes (0-1439)
 
     public Clock() {
-        this.time = 0; // Starting at 12:00 AM
+        this.time = (5*60); // Starting at 12:00 AM
     }
 
     // Method to move time forward by a certain number of minutes (in 5-minute increments)
@@ -30,5 +30,18 @@ public class Clock {
     // Method to get the current hour
     public int getCurrentHour() {
         return time / 60;
+    }
+
+    public String getTimeOfDay() {
+        int hour = getCurrentHour();
+        if (hour >= 5 && hour < 12) {
+            return "morning";
+        } else if (hour >= 12 && hour < 17) {
+            return "afternoon";
+        } else if (hour >= 17 && hour < 20) {
+            return "evening";
+        } else {
+            return "night";
+        }
     }
 }
