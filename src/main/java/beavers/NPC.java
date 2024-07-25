@@ -13,12 +13,7 @@ public class NPC {
     public String getName() {
         return name;
     }
-    
-    public void dialogue(Player player) {
-        System.out.println("Hello, " + player.getName() + "!");
-        System.out.println(disc);
-    }
-    
+     
     public void setName(String name) {
         this.name = name;
     }
@@ -29,5 +24,9 @@ public class NPC {
     
     public void setDisc(String disc) {
         this.disc = disc;
-    }   
+    }
+
+    public String getDialogue() {
+        return "Hello, I am " + name + ". " + disc;
+    }
 }

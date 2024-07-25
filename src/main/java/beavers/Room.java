@@ -23,10 +23,9 @@ public class Room {
         createItemFile(name, description,this.optional);
         
     }
-
     public NPC getNPC(String name) {
             for (NPC npc : npcs) {
-                if (npc.getName().equals(name)) {
+                if (npc.getName().equalsIgnoreCase(name)) {
                     return npc;
                 }
             }
@@ -35,6 +34,7 @@ public class Room {
 
 public void addNPC(NPC npc) {
     npcs.add(npc);
+    System.out.println("NPC added to room.");
 }
 
 public void removeNPC(NPC npc) {
@@ -104,18 +104,7 @@ public String getName() {
         describeNPCs();
     }
 
-    public NPC getNPCByName(String input) {
-        if (input == null) {
-            return null;
-        }else {
-            for (NPC npc : npcs) {
-                if (npc.getName().equals(input)) {
-                    return npc;
-                }
-            }
-            return null;
-        }
-    }
+
 
     public Item getItemByName(String input) {
         for (Item item : items) {
@@ -133,14 +122,18 @@ public String getName() {
     public ArrayList<NPC> getNpcs() {
         return npcs;
     }
-
-    public String getDescription() {
-        return description;
+public void listNPCs() {
+    for (NPC npc : this.npcs) {
+        System.out.println(npc.getName());
     }
+}
+public String getDescription() {
+    return description;
+}
 
     public Item getItem(String input) {
         for (Item item : items) {
-            if (item.getName().equals(input)) {
+            if (item.getName().equalsIgnoreCase(input)) {
                 return item;
             }
         }
@@ -206,5 +199,14 @@ public String getName() {
             }
             return sb.toString();
         }
+
+    public boolean hasNPC(String input) {
+        for (NPC npc : npcs) {
+            if (npc.getName().equalsIgnoreCase(input)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
 }

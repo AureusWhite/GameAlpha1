@@ -45,7 +45,9 @@ public void setPerk(String perk) {
 
 public void go(Room room) {
 this.room = room;
-this.room.getDescription();
+this.getRoom().listItems();
+System.out.println("NPCs in room: ");
+this.getRoom().listNPCs();
     }
 
     public String getName() {
@@ -56,11 +58,11 @@ this.room.getDescription();
         return perks.keySet().toString();
     }
 
-    public String getInventory() {
+    public ArrayList<Item> getInventory() {
         if (inventory.isEmpty()) {
-            return "Inventory is empty.";
+            return null;
         }else {
-            return "Inventory: " + inventory;
+            return inventory;
         }
         }
 
@@ -72,8 +74,14 @@ this.room.getDescription();
     public void talk() {
         System.out.println("To whom?");
         try (Scanner scanner = new Scanner(System.in)) {
-            String input = scanner.nextLine();
-            this.getRoom().getNPCByName(input).dialogue(this);
+            String input = scanner.nextLine().toLowerCase();
+            for (NPC npc : npcs) {
+                if (npc.getName().equalsIgnoreCase(input)) {
+                    npc.getDialogue();
+                    return;
+                }
+            }
+            System.out.println("No such NPC.");
         }
         
     }
@@ -242,6 +250,16 @@ this.room.getDescription();
         return "Player[]";
     }
     
+    public void listItems() {
+        if (!inventory.isEmpty()) {
+            for (Item item : inventory) {
+                System.out.println(item.getName());
+            }
+        }else {
+            System.out.println("Inventory is empty.");
+        }
+    }
+    
     Room getRoom() {
         return this.room;
     }
@@ -267,7 +285,6 @@ this.room.getDescription();
         perks.put("Confederate", Confederate);
     }
     
-    @SuppressWarnings("unused")
     private String readFile(String fileName) {
  StringBuilder sb = new StringBuilder();
  try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -361,19 +378,26 @@ this.room.getDescription();
             this.description = input;
 
     }
-    
+
     private void textWall(String string) {
         System.out.println(readFile(string));
     }
 
-    public void listItems() {
-        if (!inventory.isEmpty()) {
-            for (Item item : inventory) {
-                System.out.println(item.getName());
+
+    public Item getItem(String input) {
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(input)) {
+                return item;
             }
-        }else {
-            System.out.println("Inventory is empty.");
         }
+        return null;
+    }
+
+    public void dropItem(Item item) {
+        inventory.remove(item);
+        this.getRoom().addItem(item);
+        System.out.println("You dropped " + item.getName());
+
     }
 
 }

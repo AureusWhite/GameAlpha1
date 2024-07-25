@@ -34,4 +34,12 @@ public class Item {
         
     }
 
+    public void use() {
+        if(this.type.equalsIgnoreCase("tool")) {
+            System.out.println("You used the " + this.name);
+        }else{
+            System.out.println("You can't use the " + this.name);
+        }
+    }
+
 }
