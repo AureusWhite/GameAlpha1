@@ -1,37 +1,81 @@
 package beavers;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.Set;
 
-public final class Game {
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
+public final class Game extends JFrame{
     public static Game game;
     private final Player player;
     private boolean running;
     private HashMap<String, Command> commands;
     private HashMap<String, Room> rooms;
     private String input;
-    private Scanner scanner;
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
+    private JTextArea outputArea;
+    private JTextField inputField;
+    private JButton submitButton;
 
     public Game(Player player) {
+        setTitle("Game");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        add(scrollPane, BorderLayout.WEST);
+
+        inputField = new JTextField();
+        submitButton = new JButton("Submit");
+        inputField.addActionListener(new ActionListener() {
+            private JTextComponent inputField;
+        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String input = inputField.getText();
+                outputArea.append(input + "\n");
+            }
+        });
+        add(inputField, BorderLayout.SOUTH);
+        add(submitButton, BorderLayout.SOUTH);
+        submitButton.addActionListener(new ActionListener() {
+            private boolean inputReady;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synchronized (Game.this) {
+                    input = inputField.getText();
+                    inputReady = true;
+                }
+            }
+        });
+        setVisible(true);
+
         game = this;
-        scanner = new Scanner(System.in);
         this.player = player;
         initualizeCommands();
         buildMap();
         buildWorld();
     }
-
+    public String getInput() {
+        return inputField.getText();
+    }
     public void start() {
         running = true;
-        System.out.println("Welcome to the game.");
-        System.out.println("Type 'help' for a list of advanced commands.");
+        printToConsole("Welcome to the game.");
+        printToConsole("Type 'help' for a list of advanced commands.");
         this.gameLoop();
     }
     
@@ -61,16 +105,7 @@ public final class Game {
         rooms.get("bathroom").addItem(puzzle);
     
     }
-    
-    public void clearConsole() {
-        // Print several new lines to push the previous output up
-        for (int i = 0; i < 10; i++) {
-            System.out.println(".");
-        }
-        System.out.println("------------------------------------------------");
-        System.out.flush();
-    }
-    
+   
     public Player getPlayer() {
         return player;
     }
@@ -101,35 +136,29 @@ public final class Game {
 
 private void gameLoop() {
     while (running) {
-        clearConsole() ;
-        System.out.print("| ");
-        for (String command : commands.keySet()) {
-            System.out.print(command + " | ");
-        }
-        System.out.println();
-        System.out.print("What do you want to do? -> ");
+        printToConsole(readFile(player.getRoom().getName().concat(player.getRoom().getClock().getTimeOfDay())));
+        printToConsole("What do you want to do? ->");
         try {
-            if (scanner.hasNextLine()) {
-                input = scanner.nextLine();
-                if (input != null && !input.isBlank()) {
-                    Command command = commands.get(input);
-                    if (command != null) {
-                        command.execute();
-                    } else {
-                        System.out.println("No such command.");
-                    }
+            if (inputField.getText() != null && !inputField.getText().isBlank()) {
+                Command command = commands.get(inputField.getText());
+                if (command != null) {
+                    command.execute();
                 } else {
-                    System.out.println("Invalid input.");
+                    printToConsole("No such command.");
                 }
             } else {
-                System.out.println("No input available.");
+                printToConsole("Invalid input.");
             }
         } catch (Exception ex) {
-            System.out.println("Error reading input: " + ex.getMessage());
+            printToConsole("Error reading input: " + ex.getMessage());
         }
-    }
+        printToConsole("What do you want to do? -> ");
+    }   
 }
+        public void printToConsole(String string) {
+            outputArea.append(string);
 
+        }
     private void buildMap() {
         rooms = new HashMap<>();
         Room foyer = new Room("foyer");
@@ -155,7 +184,7 @@ private void gameLoop() {
                 line = br.readLine();
             }
         } catch (IOException ex) {
-            System.out.println("Error reading file: " + ex.getMessage());
+            printToConsole("Error reading file: " + ex.getMessage());
             ex.printStackTrace();
         }
         return sb.toString();
@@ -164,87 +193,92 @@ private void gameLoop() {
     private void initualizeCommands() {
 commands = new HashMap<>();
         commands.put("go", (Command) () -> {
-            System.out.println(ANSI_YELLOW + "Where would you like to go?" + ANSI_RESET);
             try {
-                String input = scanner.nextLine();
+                String input = getInput().toLowerCase();
                 Room nextRoom = rooms.get(input);
                 if (nextRoom != null) {
                     player.go(nextRoom);
-                    System.out.print(readFile((player.getRoom().getName())+player.getRoom().getClock().getTimeOfDay()));
+                    printToConsole(readFile((player.getRoom().getName())+player.getRoom().getClock().getTimeOfDay()));
                 } else {
-                    System.out.println("No room by that name.");
+                    printToConsole("No room by that name.");
                     
                 }
             }finally {
-                System.out.println("Error reading input.");
+                printToConsole("Error reading input.");
             }
             });
         commands.put("talk", (Command) () -> {
-            System.out.println("Who would you like to talk to?");
+            printToConsole("Who would you like to talk to?");
             try {
-                String input = scanner.nextLine().toLowerCase();
+                String input = getInput().toLowerCase();
                 if (player.getRoom().hasNPC(input)) {
                     NPC npc = player.getRoom().getNPC(input);
-                    System.out.println(npc.getName() + ": " + npc.getDialogue());
+                    printToConsole(npc.getName() + ": " + npc.getDialogue());
                 } else {
-                    System.out.println("No such NPC.");
+                    printToConsole("No such NPC.");
                 }
         } finally {
-            System.out.println("Error reading input.");
+            printToConsole("Error reading input.");
         }
         }
         );
         commands.put("quit", () -> running = false);
         commands.put("help", () -> {
-            System.out.println("Commands:");
+            printToConsole("Commands:");
             for (String command : commands.keySet()) {
-                System.out.println(command);
+                printToConsole(command);
+                player.loadGame(player.getName());
             }
         });
         commands.put("inventory", () -> {
             player.listItems();
         });
         commands.put("take", () -> {
-            System.out.println("What do you want to take?");
+            printToConsole("What do you want to take?");
             try {
-                String input = scanner.nextLine();
+                String input = game.getInput();
                 if (player.getRoom().hasItem(input)) {
                     Item item = player.getRoom().getItem(input);
                     player.takeItem(item);
-                    System.out.println("You took " + item.getName());
+                    printToConsole("You took " + item.getName());
                 } else {
-                    System.out.println("No such item.");
+                    printToConsole("No such item.");
                 }
             }finally {
-                System.out.println("Error reading input.");
+                printToConsole("Error reading input.");
             }
 
             
         });
         commands.put("look", () -> {
             this.player.getRoom().listItems();
-            System.out.println("");
-            System.out.println("NPCs in the room:");
+            printToConsole("NPCs in the room:");
             this.player.getRoom().listNPCs();
-            System.out.println("");
-            System.out.print(readFile(player.getRoom().getName().concat(player.getRoom().getClock().getTimeOfDay())));    ;
+            printToConsole(readFile(player.getRoom().getName().concat(player.getRoom().getClock().getTimeOfDay())));    ;
 
         });
         commands.put("drop", () -> {
-            System.out.println("What do you want to drop?");
+            printToConsole("What do you want to drop?");
             try{
-            String itemName = scanner.nextLine();
+            String itemName = this.getGame().getInput();
             Item item = player.getItem(itemName);
             this.player.getInventory().remove(item);
             
             if (item == null) {
-                System.out.println("Error: You don't have an item named " + itemName);
+                printToConsole("Error: You don't have an item named " + itemName);
             } else {
                 player.dropItem(item);
             }
         }finally {
-            System.out.println("Error reading input.");
+            printToConsole("Error reading input.");
         }
         });
+    }
+
+    private Game getGame() {
+        return this;
+    }
+    public void printToConsole(Set<String> keySet) {
+        // Do nothing;
     }
 }

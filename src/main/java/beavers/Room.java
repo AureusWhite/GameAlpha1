@@ -68,10 +68,6 @@ public String getName() {
         return false;
     }
 
-    public void takeItem(Item item) {
-        items.remove(item);
-    }
-
     public ArrayList<Item> getItems() {
         return items;
     }
@@ -84,24 +80,12 @@ public String getName() {
         this.npcs = npcs;
     }
 
-    public void describeItems() {
-        for (Item item : this.items) {
-            System.out.println(item.getName());
-        }
-    }
-
-    public void describeNPCs() {
-        for (NPC npc : npcs) {
-            System.out.println(npc.getName());
-        }
-    }
-
     public void describeRoom() {
         readFile(this.getName() + clock.getTimeOfDay() + ".txt");
                 System.out.println("Items in the room:");
-        describeItems();
+        listItems();
         System.out.println("NPCs in the room:");
-        describeNPCs();
+        listNPCs();
     }
 
 
@@ -119,7 +103,7 @@ public String getName() {
         return this.items.toString();
     }
      
-    public ArrayList<NPC> getNpcs() {
+    public ArrayList<NPC> listNpcs() {
         return npcs;
     }
 public void listNPCs() {
@@ -158,16 +142,13 @@ public String getDescription() {
         return clock;
     }
 
-    public void setClock(Clock clock) {
-        this.clock = clock;
-    }
-
-    public String getOptional() {
-        return optional;
-    }
-
-    public void setOptional(String optional) {
-        this.optional = optional;
+    public boolean hasNPC(String input) {
+        for (NPC npc : npcs) {
+            if (npc.getName().equalsIgnoreCase(input)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void createItemFile(String name, String desc,String optional) {
@@ -199,14 +180,5 @@ public String getDescription() {
             }
             return sb.toString();
         }
-
-    public boolean hasNPC(String input) {
-        for (NPC npc : npcs) {
-            if (npc.getName().equalsIgnoreCase(input)) {
-                return true;
-            }
-        }
-        return false;
-    }
     
 }

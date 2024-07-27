@@ -1,17 +1,17 @@
 package beavers;
 
+import javax.swing.SwingUtilities;
 
 public class Main {
+        public static void main(String[] args) {
+            Player player = new Player();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    new Game(player);
+                }
+            });
 
-    @SuppressWarnings("unused")
-    private static Room room;
-    @SuppressWarnings("unused")
-    private static NPC npc;
-
-    public static void main(String[] args) {
-        Player player = new Player();
-        Game game = new Game(player);
-        game.start();
 
     }
 }

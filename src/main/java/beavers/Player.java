@@ -1,11 +1,11 @@
 package beavers;
-
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class Player {
     private Room room;
@@ -17,11 +17,12 @@ public class Player {
     private int resilience,luck, hunger, thirst, fatigue, stress, money, experience, level;
     private HashMap<String, Perk> perks;
     private Perk TeaParty,Brat,Trouble,Shy,Bookworm,Rebel,Overachiever,TeacherPet,ClassClown,Slacker,Popular,Outcast,Geek,Confederate;
-    private Scanner scanner;
+    private Game game;
+    private String input;
 
     public Player(){
         this.room = new Room("Default");
-        scanner = new Scanner(System.in);
+        this.game = new Game(this);
         inventory = new ArrayList<Item>();
         npcs = new ArrayList<NPC>();
         stats = new HashMap<>();
@@ -46,7 +47,7 @@ public void setPerk(String perk) {
 public void go(Room room) {
 this.room = room;
 this.getRoom().listItems();
-System.out.println("NPCs in room: ");
+this.game.printToConsole("NPCs in room: ");
 this.getRoom().listNPCs();
     }
 
@@ -72,18 +73,12 @@ this.getRoom().listNPCs();
     }
 
     public void talk() {
-        System.out.println("To whom?");
-        try (Scanner scanner = new Scanner(System.in)) {
-            String input = scanner.nextLine().toLowerCase();
-            for (NPC npc : npcs) {
-                if (npc.getName().equalsIgnoreCase(input)) {
-                    npc.getDialogue();
-                    return;
-                }
-            }
-            System.out.println("No such NPC.");
+        this.game.printToConsole("To whom?");
+        String input = this.game.getInput();
+        if(this.room.hasNPC(input)) {
+            NPC npc = this.room.getNPC(input);
+            this.game.printToConsole(npc.getName() + ": " + npc.getDialogue());
         }
-        
     }
 
     public int getResilience() {
@@ -253,11 +248,27 @@ this.getRoom().listNPCs();
     public void listItems() {
         if (!inventory.isEmpty()) {
             for (Item item : inventory) {
-                System.out.println(item.getName());
+                this.game.printToConsole(item.getName());
             }
         }else {
-            System.out.println("Inventory is empty.");
+            this.game.printToConsole("Inventory is empty.");
         }
+    }
+    
+    public Item getItem(String input) {
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(input)) {
+                return item;
+            }
+        }
+        return null;
+    }
+    
+    public void dropItem(Item item) {
+        inventory.remove(item);
+        this.getRoom().addItem(item);
+        this.game.printToConsole("You dropped " + item.getName());
+
     }
     
     Room getRoom() {
@@ -284,7 +295,7 @@ this.getRoom().listNPCs();
         perks.put("Geek", Geek);
         perks.put("Confederate", Confederate);
     }
-    
+
     private String readFile(String fileName) {
  StringBuilder sb = new StringBuilder();
  try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -295,11 +306,11 @@ this.getRoom().listNPCs();
          line = br.readLine();
      }
     }   catch (IOException ex) {
-        System.out.println("Error reading file.");
+        this.game.printToConsole("Error reading file.");
         }
         return sb.toString();
     }
-    
+
     private void createPlayer() {
         stats.put("resilience", 5);
         stats.put("fineMotor", 5);
@@ -346,58 +357,115 @@ this.getRoom().listNPCs();
         this.imgenation = 5;
         this.perk = "Default";
         textWall("tutorial.txt");
-            System.out.print("What is your name? -> ");
-            String input = this.scanner.nextLine();
-            System.out.println("Hello, " + input + "!");
+    
+        if (game != null) {
+            this.game.printToConsole("What is your name? -> ");
+            String input = game.getInput();
+            this.game.printToConsole("Hello, " + input + "!");
             textWall("intro.txt");
             this.name = input;
-            do{
-            System.out.println("What is your perk? -> ");
-            System.out.println(perks.keySet());
-            input = this.scanner.nextLine();
-            textWall(input + ".txt");
-            if(perks.containsKey(input)){
-                System.out.println("Are you sure you want to choose " + input + "? (yes/no)");
-                String confirm = scanner.nextLine();
-                if(confirm.equalsIgnoreCase("yes")){
-                    System.out.println("You have chosen " + input + "!");
-                }else if(confirm.equalsIgnoreCase("info")) {
-
-                }else {
-                    System.out.println("Invalid input. Please choose from the following: \n" + perks.keySet() + "\n Or type 'info' for more information.Aureu");
-                    input = "Default";
-                    break;
+            
+            this.game.printToConsole("What is your perk? -> ");
+            if (perks != null) {
+                this.game.printToConsole(perks.keySet());
+                input = game.getInput();
+                textWall(input + ".txt");
+                
+                if (perks.containsKey(input)) {
+                    this.game.printToConsole("Are you sure you want to choose " + input + "? (yes/no)");
+                    String confirm = game.getInput();
+                    
+                    if (confirm.equalsIgnoreCase("yes")) {
+                        this.perk = input;
+                    } else {
+                        this.game.printToConsole("Perk selection cancelled.");
+                    }
+                } else {
+                    this.game.printToConsole("Invalid perk selected.");
                 }
-                this.perk = input;
-            }else { 
-                System.out.println("Invalid perk. Please choose from the following: \n" + perks.keySet());
+            } else {
+                this.game.printToConsole("Perks are not initialized.");
             }
-        }while(perk.equals("Default"));
-            System.out.println("What is your description?");
-            input = this.scanner.nextLine();
-            this.description = input;
+        } else {
+            System.out.println("Game object is not initialized.");
+        }
+    }
+        
 
+    public void saveGame() {
+        String fileName = this.name + ".txt";
+        File file = new File(fileName);
+        if(!file.exists()) {
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
+            fileWriter.write("Player Name: " + this.name + "\n");
+            fileWriter.write("Description: " + this.description + "\n");
+            fileWriter.write("Stats: " + this.stats + "\n");
+            fileWriter.write("Perk: " + this.perk + "\n");
+            fileWriter.write("Inventory: " + this.inventory + "\n");
+            fileWriter.write("NPCs: " + this.npcs + "\n");
+            fileWriter.write("Room: " + this.room + "\n");
+        } catch (IOException e) {
+            this.game.printToConsole("Something done sploded :( " + fileName);
+        }
+        }
+    }
+    public void loadGame(String name) {
+        String fileName = name + ".txt";
+        File file = new File(fileName);
+        if(file.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                String line = br.readLine();
+                while (line != null) {
+                    if(line.contains("Player Name:")) {
+                        this.name = line.substring(13);
+                    }else if(line.contains("Description:")) {
+                        this.description = line.substring(13);
+                    }else if(line.contains("Stats:")) {
+                        this.stats.put(line.substring(7, 18), Integer.parseInt(line.substring(19)));
+                    }else if(line.contains("Perk:")) {
+                        this.perk = line.substring(6);
+                    }else {
+                        this.game.printToConsole("Error reading file.");
+                    }
+                    this.game.printToConsole(line);
+                    line = br.readLine();
+                }
+            } catch (IOException e) {
+                this.game.printToConsole("Error reading file.");
+            }
+        }else {
+            this.game.printToConsole("No such file.");
+        }
     }
 
     private void textWall(String string) {
-        System.out.println(readFile(string));
+        this.game.printToConsole(readFile(string));
     }
 
-
-    public Item getItem(String input) {
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(input)) {
-                return item;
-            }
+    private void createItemFile(String name, String desc,String optional) {
+        int[] stats = new int[6];
+    
+        String fileName = name + ".txt";
+        File file = new File(fileName);
+        if(!file.exists()) {
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
+            fileWriter.write("Player Name: " + name + "\n");
+            fileWriter.write("Description: " + desc + "\n");
+            fileWriter.write("Stats" + stats + "\n");
+        } catch (IOException e) {
+            this.game.printToConsole("Something done sploded :( " + fileName);
         }
-        return null;
+        }
     }
 
-    public void dropItem(Item item) {
-        inventory.remove(item);
-        this.getRoom().addItem(item);
-        System.out.println("You dropped " + item.getName());
-
+    public void listStats() {
+        this.game.printToConsole("Stats: ");
+        for (String stat : stats.keySet()) {
+            this.game.printToConsole(stat + ": " + stats.get(stat));
+        }
     }
 
+    public void setGame(Game game) {
+        this.game = game;
+    }
 }
