@@ -1,4 +1,4 @@
-package beavers;
+package jackal.face;
 
 public class Clock {
     private int time;

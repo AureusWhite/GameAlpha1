@@ -1,184 +1,132 @@
-package beavers;
+package jackal.face;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Room {
-    ArrayList <NPC> npcs;
-    ArrayList <Item> items;
-    private String description="blargh";    
+    private HashMap<String, Room> exits;
     private String name;
-    private Clock clock;
+    private ArrayList<Item> inventory;
+    private ArrayList<NPC> npcs;
+    private NPC npc;
     private String optional;
+    private String description;
+
+    public Room(String name, ArrayList<Item> inventory) {
+        createItemFile();
+        this.npcs = new ArrayList<NPC>();
+        npc = new NPC("Default NPC", "Default NPC description");
+        npcs.add(npc);
+        this.name = name;
+        exits = new HashMap<String, Room>();
+
+    }
+    private void createItemFile() {
+        String fileName = this.name.replace(" ", "_") + ".txt"; // Sanitize the file name
+        File file = new File(fileName);
+        if (!file.exists()) {
+            try (FileWriter fileWriter = new FileWriter(fileName)) {
+                fileWriter.write("Item Name: " + this.name + "\n");
+                fileWriter.write("Description: " + this.description + "\n");
+                fileWriter.write("Optional: " + this.optional + "\n");
+            } catch (IOException e) {
+                System.out.println("Something done sploded :( " + fileName);
+                e.printStackTrace();
+            }
+        }
+    }
+    public Room getExit(String roomName) {
+        return exits.get(roomName);
+    }
+
+    String getName() {
+        return this.name;
+    }
 
     public Room(String name) {
         this.name = name;
-        npcs = new ArrayList <>();
-        items = new ArrayList <>();
-        clock = new Clock();
-        createItemFile(name, description,this.optional);
-        
+        this.npcs = new ArrayList<NPC>();
+        exits = new HashMap<String, Room>();
+        npc = new NPC("Default NPC", "Default NPC description");
+        npcs.add(npc);
     }
-    public NPC getNPC(String name) {
-            for (NPC npc : npcs) {
-                if (npc.getName().equalsIgnoreCase(name)) {
-                    return npc;
-                }
-            }
-            return null;
+
+    public void addExit(String string, Room room) {
+        exits.put(string, room);
+    }
+
+    public void removeExit(String string) {
+        exits.remove(string);
+    }
+
+    public String[] getExits() {
+        StringBuilder exitsString = new StringBuilder();
+        for (String exit : exits.keySet()) {
+            exitsString.append(exit).append(" ");
         }
-
-public void addNPC(NPC npc) {
-    npcs.add(npc);
-    System.out.println("NPC added to room.");
-}
-
-public void removeNPC(NPC npc) {
-    npcs.remove(npc);
-}
-
-public String getName() {
-        return name;
-    }
-
-    public void addItem(Item item) {
-        items.add(item);
-    }
-
-    public void removeItem(Item item) {
-        items.remove(item);
-    }
-
-    public void listItems() {
-        for (Item item : items) {
-            System.out.println(item.getName());
-        }
-    }
-
-    public boolean hasItem(String itemName) {
-        for (Item item : items) {
-            if (item.getName().equals(itemName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public ArrayList<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(ArrayList<Item> items) {
-        this.items = items;
-    }
-
-    public void setNpcs(ArrayList<NPC> npcs) {
-        this.npcs = npcs;
-    }
-
-    public void describeRoom() {
-        readFile(this.getName() + clock.getTimeOfDay() + ".txt");
-                System.out.println("Items in the room:");
-        listItems();
-        System.out.println("NPCs in the room:");
-        listNPCs();
-    }
-
-
-
-    public Item getItemByName(String input) {
-        for (Item item : items) {
-            if (item.getName().equals(input)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public String getInventory() {
-        return this.items.toString();
-    }
-     
-    public ArrayList<NPC> listNpcs() {
-        return npcs;
-    }
-public void listNPCs() {
-    for (NPC npc : this.npcs) {
-        System.out.println(npc.getName());
-    }
-}
-public String getDescription() {
-    return description;
-}
-
-    public Item getItem(String input) {
-        for (Item item : items) {
-            if (item.getName().equalsIgnoreCase(input)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public void setDescription(String description) {
-
-        this.description = description;
-
-    }
-
-    public String getTod() {
-        return clock.getTimeOfDay();
+        return exitsString.toString().split(" ");
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public Clock getClock() {
-        return clock;
+    public void setExits(HashMap<String, Room> exits) {
+        this.exits = exits;
     }
 
-    public boolean hasNPC(String input) {
-        for (NPC npc : npcs) {
-            if (npc.getName().equalsIgnoreCase(input)) {
-                return true;
+    public void addExits(HashMap<String, Room> exits) {
+        this.exits.putAll(exits);
+    }
+
+    public void removeExits(String exitName) {
+        this.exits.remove(exitName);
+    }
+    public void setExit(String exitName, Room room) {
+        this.exits.put(exitName, room);
+    }
+
+    public String getDescription() {
+        Game.readFile("Hallway.txt");   
+        return "\n";
+
+    }
+
+    public ArrayList<Item> getInventory() {
+if(this.inventory!=null) {
+            return this.inventory;
+        }
+        ArrayList<Item> newInventory = new ArrayList<Item>();
+        this.inventory = newInventory;
+        return this.inventory;
+    }
+
+    public Room getExitByName(String string) {
+        for (String exit : exits.keySet()) {
+            if (exit.equals(string)) {
+                return exits.get(exit);
             }
         }
-        return false;
+        return null;
     }
 
-    private void createItemFile(String name, String desc,String optional) {
-        String tod = clock.getTimeOfDay();
-        String fileName = name + tod +".txt";
-        File file = new File(fileName);
-        if(!file.exists()) {
-        try (FileWriter fileWriter = new FileWriter(fileName)) {
-            fileWriter.write("Room Name: " + name + "\n");
-            fileWriter.write("Description: " + desc + "\n");
-            fileWriter.write("Time of Day: " + tod +"\n");
-        } catch (IOException e) {
-            System.out.println("Something done sploded :( " + fileName);
-        }
-        }
+    public void removeItem(Item item) {
+        this.getInventory().remove(item);
     }
 
-    private String readFile(String fileName) {
-     StringBuilder sb = new StringBuilder();
-     try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-         String line = br.readLine();
-         while (line != null) {
-             sb.append(line);
-             sb.append(System.lineSeparator());
-             line = br.readLine();
-         }
-        }   catch (IOException ex) {
-            System.out.println("Error reading file.");
+    public void addItem(Item item) {
+        this.getInventory().add(item);
+    }
+
+    public NPC getNPCByName(String npcName) {
+        for (NPC npc : this.npcs) {
+            if (npc.getName().equals(npcName)) {
+                return npc;
             }
-            return sb.toString();
         }
-    
+        return npc;
+    }
 }

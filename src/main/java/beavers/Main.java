@@ -1,17 +1,8 @@
-package beavers;
-
-import javax.swing.SwingUtilities;
+package jackal.face;
 
 public class Main {
-        public static void main(String[] args) {
-            Player player = new Player();
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    new Game(player);
-                }
-            });
-
-
+    public static void main(String[] args) {
+        Game game = new Game();
+        game.startGame();
     }
-}
+    }
